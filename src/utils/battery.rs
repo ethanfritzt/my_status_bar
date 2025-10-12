@@ -3,7 +3,7 @@ use crate::status;
 const PATH: &str = "/sys/class/power_supply/BAT0/uevent";
 //const POWER_SUPPLY_NAME: &str = "POWER_SUPPLY_NAME";
 //const POWER_SUPPLY_TYPE: &str = "POWER_SUPPLY_TYPE";
-//const POWER_SUPPLY_STATUS: &str = "POWER_SUPPLY_STATUS";
+const POWER_SUPPLY_STATUS: &str = "POWER_SUPPLY_STATUS";
 //const POWER_SUPPLY_PRESENT: &str = "POWER_SUPPLY_PRESENT";
 //const POWER_SUPPLY_TECHNOLOGY: &str = "POWER_SUPPLY_TECHNOLOGY";
 //const POWER_SUPPLY_CYCLE_COUNT: &str = "POWER_SUPPLY_CYCLE_COUNT";
@@ -22,7 +22,8 @@ const POWER_SUPPLY_ENERGY_NOW: &str = "POWER_SUPPLY_ENERGY_NOW";
 #[derive(Default)]
 struct BatteryInfo {
     current_charge: String,
-    total_charge: String
+    total_charge: String,
+    status: String
 }
 
 trait GetBatteryInfo {
@@ -62,34 +63,17 @@ impl GetBatteryInfo for BatteryInfo {
             if key == POWER_SUPPLY_ENERGY_FULL_DESIGN.to_string() {
                 self.total_charge = value.to_string();
             }
+
+            if key == POWER_SUPPLY_STATUS.to_string() {
+                if value == "Charging" {
+                    self.status = "CHR".to_string()
+                }
+            }
         }
     }
 }
 
-pub fn get_batt_status_line() -> status::block::StatusLineBlock {
-    let battery_level = status::block::StatusLineBlock {
-        full_text: format_battery_level(),
-        short_text: format_battery_level(),
-        color: "#ccccccff".to_string(),
-        background: "#111111ff".to_string(),
-        border: "#222222ff".to_string(),
-        border_top: 1,
-        border_bottom: 1,
-        border_left: 1,
-        border_right: 1,
-        min_width: 100,
-        align: "center".to_string(),
-        name: "bat".to_string(),
-        instance: "bat".to_string(),
-        urgent: false,
-        separator: true,
-        separator_block_width: 5,
-        markup: "none".to_string()
-    };
-    return battery_level
-}
-
-fn format_battery_level() -> String {
+pub fn get_batt_status_line() -> Vec<status::block::StatusLineBlock> {
     let mut battery_info = BatteryInfo::default();
 
     // set the values
@@ -97,6 +81,78 @@ fn format_battery_level() -> String {
 
     // return values
     let value = battery_info.get_battery_level();
+    let status = battery_info.status;
+    let battery_level = value.clone().parse::<f32>().unwrap();
+    let icon: char = get_battery_icon(battery_level, status);
+    let battery = status::block::StatusLineBlock {
+        full_text: format_battery_level(battery_level),
+        short_text: format_battery_level(battery_level),
+        color: "#ccccccff".to_string(),
+        background: "#111111ff".to_string(),
+        border: "#222222ff".to_string(),
+        border_top: 1,
+        border_bottom: 1,
+        border_left: 1,
+        border_right: 1,
+        min_width: 75,
+        align: "center".to_string(),
+        name: "bat".to_string(),
+        instance: "bat".to_string(),
+        urgent: false,
+        separator: true,
+        separator_block_width: 5,
+        markup: "pango".to_string()
+    };
+    let battery_icon = status::block::StatusLineBlock {
+        full_text: format!("<span size=\"{}\">{}</span>", 16 * 1024, icon),
+        short_text: format!("{}", icon),
+        color: get_battery_color(battery_level),
+        background: "#111111ff".to_string(),
+        border: "#222222ff".to_string(),
+        border_top: 1,
+        border_bottom: 1,
+        border_left: 1,
+        border_right: 1,
+        min_width: 35,
+        align: "center".to_string(),
+        name: "bat".to_string(),
+        instance: "bat".to_string(),
+        urgent: false,
+        separator: false,
+        separator_block_width: 0,
+        markup: "pango".to_string()
+    };
+    return vec![battery_icon, battery];
+}
 
-    return format!("{:.2}%", value.parse::<f32>().unwrap())
+fn get_battery_icon(battery_level: f32, status: String) -> char {
+    if status == "CHR" {
+        if battery_level < 50.00 {
+            return '\u{f12a5}';
+        } else if battery_level < 25.00 {
+            return '\u{f12a4}';
+        }
+        return '\u{f12a6}';
+    } else {
+        if battery_level < 50.00 {
+            return '\u{f12a5}';
+        } else if battery_level < 25.00 {
+            return '\u{f12a4}';
+        }
+
+        return '\u{f12a3}'; 
+    }
+}
+
+fn get_battery_color(battery_level: f32) -> String {
+    if battery_level < 50.00 {
+        return "#ffce1b".to_string();
+    } else if battery_level < 25.00 {
+        return "#cd1c18".to_string();
+    }
+    return "#008000".to_string();
+}
+
+fn format_battery_level(value: f32) -> String {
+    return format!("{:.2}%", value)
 }
