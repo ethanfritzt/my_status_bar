@@ -165,7 +165,9 @@ pub fn get_batt_status_line() -> Vec<status::block::StatusLineBlock> {
 }
 
 fn get_battery_icon(battery_level: f32, status: String) -> char {
-    if status == "CHR" {
+    if status == "POW" {
+        return '';
+    } else if status == "CHR" {
         if battery_level > 50.00 {
             return FULL_CHG;
         } else if battery_level > 25.00 {
