@@ -2,7 +2,7 @@ use crate::status;
 
 fn get_time() -> String {
    let now = chrono::Local::now();
-   return now.format("%H:%M").to_string();
+   now.format("%H:%M").to_string()
 }
 
 pub fn get_time_status_line() -> Vec<status::block::StatusLineBlock> {
@@ -17,5 +17,5 @@ pub fn get_time_status_line() -> Vec<status::block::StatusLineBlock> {
         ..Default::default()
     };
 
-    return vec![current_time];
+    vec![current_time]
 }

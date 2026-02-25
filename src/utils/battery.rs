@@ -47,14 +47,14 @@ impl BatteryInfo {
             let entry = entry.ok()?;
             let entry_type = entry.path().join("type");
 
-            if let Ok(contents) = std::fs::read_to_string(&entry_type) {
-                if contents.trim() == "Battery" {
-                    return Some(entry.path().join("uevent"));    
-                }
+            if let Ok(contents) = std::fs::read_to_string(&entry_type)
+            && contents.trim() == "Battery"
+            {
+                return Some(entry.path().join("uevent"));
             }
         }
 
-        return None;
+        None
     }
 
     fn get_battery_level(&self) -> Option<f32> {
@@ -67,7 +67,7 @@ impl BatteryInfo {
 
         let display_value = parsed_current_charge / parsed_total_charge * 100.0;
 
-        return Some(display_value);
+        Some(display_value)
     }
 
     fn get_battery_info(&mut self) -> Option<()> {
@@ -99,14 +99,12 @@ impl BatteryInfo {
                 self.total_charge = value.to_string();
             }
 
-            if key == POWER_SUPPLY_STATUS {
-                if value == "Charging" {
-                    self.status = "CHR".to_string()
-                }
+            if key == POWER_SUPPLY_STATUS && value == "Charging" {
+                self.status = "CHR".to_string()
             }
         }
 
-        return Some(());
+        Some(())
     }
 }
 
@@ -134,37 +132,39 @@ pub fn get_batt_status_line() -> Vec<status::block::StatusLineBlock> {
         color: get_battery_color(battery_level),
         ..Default::default()
     };
-    return vec![battery_icon, battery];
+    vec![battery_icon, battery]
 }
 
 fn get_battery_icon(battery_level: f32, status: String) -> char {
-    if status == "POW" {
-        return POW;
-    } else if status == "CHR" {
-        if battery_level > 50.00 {
-            return FULL_CHG;
-        } else if battery_level > 25.00 {
-            return HALF_CHG;
-        } else {
-            return QUARTER_CHG;
-        }
-    } else {
-        if battery_level > 50.00 {
-            return FULL;
-        } else if battery_level > 25.00 {
-            return HALF;
-        } else {
-            return QUARTER;
+    match status.as_str() {
+        "POW" => POW,
+        "CHR" => {
+            if battery_level > 50.00 {
+                FULL_CHG
+            } else if battery_level > 25.00 {
+                HALF_CHG
+            } else {
+                QUARTER_CHG
+            }
+        },
+        _ => {
+            if battery_level > 50.00 {
+                FULL
+            } else if battery_level > 25.00 {
+                HALF
+            } else {
+                QUARTER
+            }
         }
     }
 }
 
 fn get_battery_color(battery_level: f32) -> String {
     if battery_level > 50.00 {
-        return "#008000".to_string();
+        "#008000".to_string()
     } else if battery_level > 25.00 {
-        return "#ffce1b".to_string();
+        "#ffce1b".to_string()
     } else {
-        return "#cd1c18".to_string();
+        "#cd1c18".to_string()
     }
 }
