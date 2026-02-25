@@ -24,11 +24,11 @@ fn output_header() {
 }
 
 fn run_process() {
-    let battery_level = utils::battery::get_batt_status_line();
-    let current_time = utils::time::get_time_status_line();
+    let json_body: Vec<status::block::StatusLineBlock> = vec![
+        utils::battery::get_batt_status_line(),
+        utils::time::get_time_status_line()
+    ].into_iter().flatten().collect();
 
-    let json_body = serde_json::json!([battery_level[0], battery_level[1], current_time]);
-
-    print!("{},", json_body);
+    print!("{},", serde_json::to_string(&json_body).unwrap());
     let _ = std::io::stdout().flush();
 }
