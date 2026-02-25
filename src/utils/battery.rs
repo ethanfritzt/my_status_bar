@@ -28,6 +28,7 @@ const QUARTER: char = '\u{f12a1}';
 const HALF_CHG: char = '\u{f12a5}';
 const FULL_CHG: char = '\u{f12a6}';
 const QUARTER_CHG: char = '\u{f12a4}';
+const POW: char = '\u{f1c3b}';
 
 #[derive(Default)]
 struct BatteryInfo {
@@ -166,7 +167,7 @@ pub fn get_batt_status_line() -> Vec<status::block::StatusLineBlock> {
 
 fn get_battery_icon(battery_level: f32, status: String) -> char {
     if status == "POW" {
-        return '';
+        return POW;
     } else if status == "CHR" {
         if battery_level > 50.00 {
             return FULL_CHG;
