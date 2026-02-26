@@ -127,7 +127,6 @@ pub fn get_batt_status_line() -> Vec<status::block::StatusLineBlock> {
     let icon: char = get_battery_icon(battery_level, status);
     let battery = status::block::StatusLineBlock {
         full_text: format!("{:.2}%", battery_level),
-        short_text: format!("{:.2}%", battery_level),
         name: "bat".to_string(),
         instance: "bat".to_string(),
         separator: true,
@@ -135,7 +134,6 @@ pub fn get_batt_status_line() -> Vec<status::block::StatusLineBlock> {
     };
     let battery_icon = status::block::StatusLineBlock {
         full_text: format!("<span size=\"{}\">{}</span>", 16 * 1024, icon),
-        short_text: format!("{}", icon),
         color: get_battery_color(battery_level),
         ..Default::default()
     };
