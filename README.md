@@ -8,3 +8,12 @@ complete programs I have made in rust
 I relied pretty heavily on i3status [i3status](https://github.com/i3/i3status/tree/main)
 although my program is far more stripped down and simplier
 witout many of the same features
+
+Requires you to install a font library for the icons
+Here is what I used:
+
+```mkdir -p ~/.local/share/fonts
+cd ~/.local/share/fonts
+wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip
+unzip JetBrainsMono.zip
+fc-cache -fv```
