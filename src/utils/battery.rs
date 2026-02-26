@@ -28,7 +28,7 @@ const QUARTER: char = '\u{f12a1}';
 const HALF_CHG: char = '\u{f12a5}';
 const FULL_CHG: char = '\u{f12a6}';
 const QUARTER_CHG: char = '\u{f12a4}';
-const POW: char = '\u{F06A5}';
+const POW: char = '\u{f06a5}';
 
 #[derive(Default)]
 struct BatteryInfo {
