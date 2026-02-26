@@ -17,3 +17,7 @@ cd ~/.local/share/fonts
 wget https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip
 unzip JetBrainsMono.zip
 fc-cache -fv```
+
+And then adding this into my .i3/config:
+
+```font pango:JetBrainsMono Nerd Font 10```
