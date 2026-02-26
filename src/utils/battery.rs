@@ -32,6 +32,7 @@ const POW: char = '\u{F06A5}';
 
 #[derive(Default)]
 struct BatteryInfo {
+    battery_path: Option<std::path::PathBuf>,
     current_charge: String,
     total_charge: String,
     status: String
@@ -71,8 +72,13 @@ impl BatteryInfo {
     }
 
     fn set_battery_info(&mut self) -> Option<()> {
-        let event_path = match BatteryInfo::find_battery() {
-            Some(event_path) => event_path,
+        // use battery_path and if not set find the battery
+        // and set it
+        if self.battery_path.is_none() {
+            self.battery_path = BatteryInfo::find_battery();
+        }
+        let event_path = match &self.battery_path {
+            Some(path) => path,
             None => {
                 self.status = "POW".to_string();
                 self.current_charge = 0.to_string();
@@ -81,7 +87,8 @@ impl BatteryInfo {
             }
         };
     
-        let content = std::fs::read_to_string(&event_path).ok()?;
+        // read from the event_path
+        let content = std::fs::read_to_string(event_path).ok()?;
 
         for line in content.lines() {
             let split_str: Vec<&str> = line.split("=").collect();
