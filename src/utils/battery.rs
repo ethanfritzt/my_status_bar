@@ -70,7 +70,7 @@ impl BatteryInfo {
         Some(display_value)
     }
 
-    fn get_battery_info(&mut self) -> Option<()> {
+    fn set_battery_info(&mut self) -> Option<()> {
         let event_path = match BatteryInfo::find_battery() {
             Some(event_path) => event_path,
             None => {
@@ -112,7 +112,7 @@ pub fn get_batt_status_line() -> Vec<status::block::StatusLineBlock> {
     let mut battery_info = BatteryInfo::default();
 
     // set the values
-    let _ = battery_info.get_battery_info();
+    let _ = battery_info.set_battery_info();
 
     // return values
     let battery_level = battery_info.get_battery_level().unwrap_or(0.0);
